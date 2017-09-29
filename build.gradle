@@ -1,0 +1,51 @@
+apply plugin: 'war'
+
+apply plugin: 'eclipse-wtp'
+
+repositories {
+  mavenCentral()
+}
+
+configurations {
+  domaGenRuntime
+}
+
+// JavaクラスとSQLファイルの出力先ディレクトリを同じにする
+processResources.destinationDir = compileJava.destinationDir
+// コンパイルより前にSQLファイルを出力先ディレクトリにコピーするために依存関係を逆転する
+compileJava.dependsOn processResources
+
+dependencies {
+  compile 'org.seasar.doma:doma:2.17.0'
+
+  compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.1'
+  compile 'com.fasterxml.jackson.core:jackson-core:2.8.1'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.8.5'
+
+  providedCompile 'javax:javaee-api:7.0'
+
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.jglue.cdi-unit:cdi-unit:4.0.1'
+  testCompile 'org.jboss.weld.se:weld-se-core:2.2.16.Final'
+  testCompile 'org.postgresql:postgresql:42.1.4'
+
+  domaGenRuntime 'org.seasar.doma:doma-gen:2.17.0'
+  domaGenRuntime 'org.postgresql:postgresql:42.1.4'
+}
+
+compileJava {
+  options.encoding = 'UTF-8'
+}
+
+task gen << {
+  ant.taskdef(resource: 'domagentask.properties', classpath: configurations.domaGenRuntime.asPath)
+  ant.gen(url: 'jdbc:postgresql://localhost/myapp', user: 'postgres', password: 'postgres') {
+    entityConfig(packageName: 'my.app.entity')
+    daoConfig(packageName: 'my.app.dao', configClassName: 'my.app.dao.config.DomaConfig')
+    sqlConfig()
+  }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '4.2'
+}
