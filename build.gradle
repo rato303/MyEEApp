@@ -37,7 +37,7 @@ compileJava {
   options.encoding = 'UTF-8'
 }
 
-task gen << {
+task gen {
   ant.taskdef(resource: 'domagentask.properties', classpath: configurations.domaGenRuntime.asPath)
   ant.gen(url: 'jdbc:postgresql://localhost/myapp', user: 'postgres', password: 'postgres') {
     entityConfig(packageName: 'my.app.entity')
@@ -49,3 +49,5 @@ task gen << {
 task wrapper(type: Wrapper) {
   gradleVersion = '4.2'
 }
+
+apply from:'eclipse.gradle'
