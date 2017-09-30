@@ -2,6 +2,7 @@ package my.app.entity;
 
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
+import org.seasar.doma.Id;
 import org.seasar.doma.Table;
 
 /**
@@ -11,6 +12,7 @@ import org.seasar.doma.Table;
 public class Employee {
 
     /** */
+    @Id
     @Column(name = "id")
     Integer id;
 
