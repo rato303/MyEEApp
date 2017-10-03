@@ -1,6 +1,14 @@
-apply plugin: 'war'
+buildscript {
+  dependencies {
+    classpath 'org.postgresql:postgresql:42.1.4'
+  }
+}
 
-apply plugin: 'eclipse-wtp'
+plugins {
+  id 'org.flywaydb.flyway' version '4.2.0'
+  id 'war'
+  id 'eclipse-wtp'
+}
 
 repositories {
   mavenCentral()
@@ -39,12 +47,25 @@ compileJava {
   options.encoding = 'UTF-8'
 }
 
+war {
+  rootSpec.exclude('**/*.java')
+  rootSpec.exclude('db')
+}
+
+flyway {
+  url = 'jdbc:postgresql://localhost:5432/myapp'
+  user = 'postgres'
+  password = 'postgres'
+}
+
 task gen {
-  ant.taskdef(resource: 'domagentask.properties', classpath: configurations.domaGenRuntime.asPath)
-  ant.gen(url: 'jdbc:postgresql://localhost/myapp', user: 'postgres', password: 'postgres') {
-    entityConfig(packageName: 'my.app.entity')
-    daoConfig(packageName: 'my.app.dao', configClassName: 'my.app.dao.config.DomaConfig')
-    sqlConfig()
+  doLast {
+    ant.taskdef(resource: 'domagentask.properties', classpath: configurations.domaGenRuntime.asPath)
+    ant.gen(url: 'jdbc:postgresql://localhost/myapp', user: 'postgres', password: 'postgres') {
+      entityConfig(packageName: 'my.app.entity')
+      daoConfig(packageName: 'my.app.dao', configClassName: 'my.app.dao.config.DomaConfig')
+      sqlConfig()
+    }
   }
 }
 

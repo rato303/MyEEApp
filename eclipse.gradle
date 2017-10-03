@@ -1,5 +1,3 @@
-apply plugin: 'eclipse-wtp'
-
 ext {
   aptDir='.apt_generated'
 }
